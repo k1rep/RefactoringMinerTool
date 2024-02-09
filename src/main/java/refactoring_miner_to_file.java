@@ -24,10 +24,21 @@ public class refactoring_miner_to_file {
         // 'drools': https://github.com/kiegroup/drools, main
         // 'weld': https://github.com/weld/core, master
         // 'infinispan': https://github.com/infinispan/infinispan, main
-        String proj_name = "WildFlyElytron";
-        String github_link = "https://github.com/wildfly-security/wildfly-elytron";
-        String brench = "master";
+        // 'keycloak': https://github.com/keycloak/keycloak, main
+        // 'derby': https://github.com/apache/derby, trunk
+        // 'hornetq': https://github.com/hornetq/hornetq, remotes/origin/2.4.x
+        String proj_name = "hornetq";
+        String github_link = "https://github.com/hornetq/hornetq";
+        String brench = "remotes/origin/2.4.x";
 
+        String directoryPath = "refactoring_files/" + proj_name;
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            boolean result = directory.mkdirs(); // 创建所有缺失的目录
+            if (!result) {
+                System.out.println("无法创建目录：" + directoryPath);
+            }
+        }
         // 下载项目到本地仓库
         Repository repo = gitService.cloneIfNotExists(
                 "tmp/" + proj_name,
@@ -38,18 +49,19 @@ public class refactoring_miner_to_file {
             miner.detectAll(repo, brench, new RefactoringHandler() {
                 @Override
                 public void handle(String commitId, List<Refactoring> refactorings) {
-                    try {
-                        BufferedWriter out = new BufferedWriter(new FileWriter("refactoring_files/" + proj_name + "/" + commitId + ".txt"));
-
+                    try (BufferedWriter out = new BufferedWriter(new FileWriter("refactoring_files/" + proj_name + "/" + commitId + ".txt"))) {
                         System.out.println("【" + get_current_time() + "】Refactorings at " + commitId);
+
+                        StringBuilder sb = new StringBuilder();
                         for (Refactoring ref : refactorings) {
-                            out.write(ref.toString() + "\n##########\n");
+                            sb.append(ref.toString()).append("\n##########\n");
                         }
-                        out.close();
-                        System.out.println("【" + get_current_time() + "】" + commitId + "导出成功！");
+
+                        out.write(sb.toString());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    System.out.println("【" + get_current_time() + "】" + commitId + "导出成功！");
                 }
 
                 @Override
