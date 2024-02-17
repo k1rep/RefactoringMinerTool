@@ -21,7 +21,7 @@ public class refactoring_miner_to_file_part {
         // 该项目信息
         String proj_name = "weld";
         String github_link = "https://github.com/weld/core";
-        String brench = "master";
+        String branch = "master";
 
         // 下载项目到本地仓库
         Repository repo = gitService.cloneIfNotExists(

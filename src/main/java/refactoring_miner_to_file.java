@@ -27,9 +27,17 @@ public class refactoring_miner_to_file {
         // 'keycloak': https://github.com/keycloak/keycloak, main
         // 'derby': https://github.com/apache/derby, trunk
         // 'hornetq': https://github.com/hornetq/hornetq, remotes/origin/2.4.x
-        String proj_name = "hornetq";
-        String github_link = "https://github.com/hornetq/hornetq";
-        String brench = "remotes/origin/2.4.x";
+        String proj_name;
+        String github_link ;
+        String branch;
+
+        if (args.length == 3) {
+            proj_name = args[0];
+            github_link = args[1];
+            branch = args[2];
+        }else{
+            throw new Exception("参数错误！");
+        }
 
         String directoryPath = "refactoring_files/" + proj_name;
         File directory = new File(directoryPath);
@@ -46,7 +54,7 @@ public class refactoring_miner_to_file {
 
         // 挖掘并筛选 refactorings
         try {
-            miner.detectAll(repo, brench, new RefactoringHandler() {
+            miner.detectAll(repo, branch, new RefactoringHandler() {
                 @Override
                 public void handle(String commitId, List<Refactoring> refactorings) {
                     try (BufferedWriter out = new BufferedWriter(new FileWriter("refactoring_files/" + proj_name + "/" + commitId + ".txt"))) {
